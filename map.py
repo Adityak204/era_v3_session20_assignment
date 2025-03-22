@@ -18,11 +18,13 @@ from kivy.clock import Clock
 from kivy.core.image import Image as CoreImage
 from PIL import Image as PILImage
 from kivy.graphics.texture import Texture
+from kivy.core.window import Window
 
 # Importing the Dqn object from our AI in ai.py
 from ai import Dqn
 
 # Adding this line if we don't want the right click to put a red point
+# Config.set("graphics", "fullscreen", "auto")
 Config.set("input", "mouse", "mouse,multitouch_on_demand")
 Config.set("graphics", "resizable", False)
 Config.set("graphics", "width", "1633")
@@ -56,8 +58,8 @@ def init():
     sand = np.zeros((longueur, largeur))
     img = PILImage.open("./images/nc_v.png").convert("L")
     sand = np.asarray(img) / 255
-    goal_x = 580
-    goal_y = 310
+    goal_x = 1060
+    goal_y = 700
     first_update = False
     global swap
     swap = 0
@@ -231,7 +233,7 @@ class Game(Widget):
                 im.read_pixel(int(self.car.x), int(self.car.y)),
             )
 
-            last_reward = -1
+            last_reward = -1.2
         # Based on car coordinates if car is in sand, we reduce its velocity and give it a negative reward
         else:  # otherwise
             self.car.velocity = Vector(2, 0).rotate(self.car.angle)
@@ -246,7 +248,7 @@ class Game(Widget):
                 im.read_pixel(int(self.car.x), int(self.car.y)),
             )
             if distance < last_distance:
-                last_reward = 0.15
+                last_reward = 0.1
             # if car distance from goal in current x,y coordinate is less than last distance based on last x,y coordinate,
             # we give it a positive reward 0.1
             # else we give it a negative reward of -0.2
@@ -254,15 +256,15 @@ class Game(Widget):
             # else:
             #     last_reward = last_reward +(-0.2)
 
-        if self.car.x < 5:
-            self.car.x = 5
-            last_reward = -0.5
+        if self.car.x < 25:
+            self.car.x = 25
+            last_reward = -1.2
         if self.car.x > self.width - 5:
             self.car.x = self.width - 5
             last_reward = -0.5
-        if self.car.y < 5:
-            self.car.y = 5
-            last_reward = -0.5
+        if self.car.y < 25:
+            self.car.y = 25
+            last_reward = -1.2
         if self.car.y > self.height - 5:
             self.car.y = self.height - 5
             last_reward = -0.5
@@ -270,12 +272,12 @@ class Game(Widget):
         if distance < 25:
             # it is difficult for car to exact x,y coordinate of goal, so we give it a range of 25
             if swap == 1:
-                goal_x = 940
-                goal_y = 570
+                goal_x = 1000
+                goal_y = 145
                 swap = 0
             else:
-                goal_x = 580
-                goal_y = 310
+                goal_x = 1060
+                goal_y = 700
                 swap = 1
         last_distance = distance
 
