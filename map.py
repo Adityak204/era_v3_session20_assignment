@@ -1,4 +1,8 @@
 # Self Driving Car
+# import logger
+from loguru import logger
+import os
+from datetime import datetime
 
 # Importing the libraries
 import numpy as np
@@ -23,12 +27,40 @@ from kivy.core.window import Window
 # Importing the Dqn object from our AI in ai.py
 from ai import Dqn
 
+
+# Setting up logging
+def setup_logging(log_dir="logs"):
+    os.makedirs(log_dir, exist_ok=True)
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    log_file = os.path.join(log_dir, f"rl_training.log")
+
+    logger.remove()
+    logger.add(
+        lambda msg: print(msg),
+        format="<green>{time:YYYY-MM-DD HH:mm:ss}</green> | {message}",
+        colorize=True,
+        level="INFO",
+    )
+
+    logger.add(
+        log_file,
+        format="{time:YYYY-MM-DD HH:mm:ss} | {level} | {message}",
+        level="INFO",
+        rotation="100 MB",
+        retention="30 days",
+    )
+
+    logger.info(f"Logging setup complete. Logs will be saved to: {log_file}")
+    return log_file
+
+
+log_file = setup_logging()
 # Adding this line if we don't want the right click to put a red point
 # Config.set("graphics", "fullscreen", "auto")
 Config.set("input", "mouse", "mouse,multitouch_on_demand")
 Config.set("graphics", "resizable", False)
-Config.set("graphics", "width", "1633")
-Config.set("graphics", "height", "980")
+Config.set("graphics", "width", "1300")
+Config.set("graphics", "height", "780")
 
 # Introducing last_x and last_y, used to keep the last point in memory when we draw the sand on the map
 last_x = 0
@@ -37,11 +69,11 @@ n_points = 0
 length = 0
 
 # Getting our AI, which we call "brain", and that contains our neural network that represents our Q-function
-brain = Dqn(5, 3, 0.9)
+brain = Dqn(5, 3, 0.95)
 action2rotation = [0, 5, -5]
 last_reward = 0
 scores = []
-im = CoreImage("./images/nc_h.png")
+im = CoreImage("./images/roads.jpg")
 
 # textureMask = CoreImage(source="./kivytest/simplemask1.png")
 
@@ -56,10 +88,12 @@ def init():
     global goal_y
     global first_update
     sand = np.zeros((longueur, largeur))
-    img = PILImage.open("./images/nc_v.png").convert("L")
-    sand = np.asarray(img) / 255
-    goal_x = 1060
-    goal_y = 700
+    img = PILImage.open("./images/roads_v.jpg").convert("L")
+    sand = np.asarray(img)
+    sand = np.where(sand < 255, 0, sand)
+    sand = sand / 255
+    goal_x = 230
+    goal_y = 330
     first_update = False
     global swap
     swap = 0
@@ -177,6 +211,7 @@ class Game(Widget):
     ball3 = ObjectProperty(None)
 
     def serve_car(self):
+        self.car.pos = (1039, 394)
         self.car.center = self.center
         self.car.velocity = Vector(6, 0)
 
@@ -223,32 +258,38 @@ class Game(Widget):
 
         if sand[int(self.car.x), int(self.car.y)] > 0:
             self.car.velocity = Vector(0.5, 0).rotate(self.car.angle)
-            print(
-                "sand",
-                goal_x,
-                goal_y,
-                distance,
-                int(self.car.x),
-                int(self.car.y),
-                im.read_pixel(int(self.car.x), int(self.car.y)),
+            last_reward = -1.2
+            logger.info(
+                f"""
+                location: sand,
+                goal_x: {goal_x},
+                goal_y: {goal_y},
+                distance: {distance},
+                car_x: {int(self.car.x)},
+                car_y: {int(self.car.y)},
+                sand_color: {im.read_pixel(int(self.car.x), int(self.car.y))},
+                reward: {last_reward}
+                """,
             )
 
-            last_reward = -1.2
         # Based on car coordinates if car is in sand, we reduce its velocity and give it a negative reward
         else:  # otherwise
             self.car.velocity = Vector(2, 0).rotate(self.car.angle)
             last_reward = -0.2
-            print(
-                "road",
-                goal_x,
-                goal_y,
-                distance,
-                int(self.car.x),
-                int(self.car.y),
-                im.read_pixel(int(self.car.x), int(self.car.y)),
-            )
             if distance < last_distance:
-                last_reward = 0.1
+                last_reward = 0.4
+            logger.info(
+                f"""
+                location: road,
+                goal_x: {goal_x},
+                goal_y: {goal_y},
+                distance: {distance},
+                car_x: {int(self.car.x)},
+                car_y: {int(self.car.y)},
+                sand_color: {im.read_pixel(int(self.car.x), int(self.car.y))},
+                reward: {last_reward}
+                """,
+            )
             # if car distance from goal in current x,y coordinate is less than last distance based on last x,y coordinate,
             # we give it a positive reward 0.1
             # else we give it a negative reward of -0.2
@@ -258,26 +299,26 @@ class Game(Widget):
 
         if self.car.x < 25:
             self.car.x = 25
-            last_reward = -1.2
-        if self.car.x > self.width - 5:
-            self.car.x = self.width - 5
-            last_reward = -0.5
+            last_reward = -10
+        if self.car.x > self.width - 25:
+            self.car.x = self.width - 25
+            last_reward = -10
         if self.car.y < 25:
             self.car.y = 25
-            last_reward = -1.2
-        if self.car.y > self.height - 5:
-            self.car.y = self.height - 5
-            last_reward = -0.5
+            last_reward = -10
+        if self.car.y > self.height - 25:
+            self.car.y = self.height - 25
+            last_reward = -10
 
         if distance < 25:
             # it is difficult for car to exact x,y coordinate of goal, so we give it a range of 25
             if swap == 1:
-                goal_x = 1000
-                goal_y = 145
+                goal_x = 230
+                goal_y = 330
                 swap = 0
             else:
-                goal_x = 1060
-                goal_y = 700
+                goal_x = 1147
+                goal_y = 601
                 swap = 1
         last_distance = distance
 

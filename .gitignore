@@ -1,0 +1,28 @@
+# ignore python cache files
+*.pyc
+*.pyo
+*.pyd
+# ignore the virtual environment
+venv/
+# ignore the database
+db.sqlite3
+# ignore the static files
+staticfiles/
+# ignore the media files
+media/
+# ignore the secret key
+secret_key.txt
+# ignore the environment file
+.env
+# ignore the logs
+logs/
+# ignore the coverage report
+htmlcov/
+# ignore pycache
+__pycache__/
+# ignore the migrations
+migrations/
+# ignore DS_Store files
+.DS_Store
+# ignore the IDE files
+.idea/

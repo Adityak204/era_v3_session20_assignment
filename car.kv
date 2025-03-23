@@ -3,7 +3,7 @@
 
 <Car>:
     size: 25, 15
-    origin: 0, 0
+    origin: 1039, 394
     canvas:
         PushMatrix
         Rotate:
@@ -12,7 +12,7 @@
         Rectangle:
             pos: self.pos
             size: self.size
-            source: "./images/bus.png"
+            source: "./images/bot_car.png"
         PopMatrix
 
 <Ball1>:
@@ -49,8 +49,8 @@
     canvas:
         Rectangle:
             pos: self.pos
-            size: self.width, self.height
-            source: "./images/new_city.jpg"
+            size: 1300, 780
+            source: "./images/citymap_new.jpg"
 
     Car:
         id: game_car

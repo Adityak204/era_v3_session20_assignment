@@ -21,9 +21,9 @@ class Network(nn.Module):
         super(Network, self).__init__()
         self.input_size = input_size
         self.nb_action = nb_action
-        self.fc1 = nn.Linear(input_size, 32)
-        self.fc2 = nn.Linear(32, 128)
-        self.fc3 = nn.Linear(128, nb_action)
+        self.fc1 = nn.Linear(input_size, 128)
+        self.fc2 = nn.Linear(128, 256)
+        self.fc3 = nn.Linear(256, nb_action)
 
     def forward(self, state):
         x = F.relu(self.fc1(state))
@@ -67,7 +67,7 @@ class Dqn:
         self.last_reward = 0
 
     def select_action(self, state):
-        probs = F.softmax(self.model(Variable(state, volatile=True)) * 50)  # T=100
+        probs = F.softmax(self.model(Variable(state, volatile=True)) * 100)  # T=100
         action = probs.multinomial(
             1
         )  # samples an action using multinomial distribution
@@ -104,9 +104,9 @@ class Dqn:
             )
         )  # Creates a transition tuple: (state, next_state, action, reward)
         action = self.select_action(new_state)  # Selects an action based on new state
-        if len(self.memory.memory) > 200:
+        if len(self.memory.memory) > 500:
             batch_state, batch_next_state, batch_action, batch_reward = (
-                self.memory.sample(200)
+                self.memory.sample(500)
             )  # Checks if there are enough transitions stored in the replay memory (at least 100)
             # Learning only starts after collecting enough experiences
             # Unpacks the sampled transitions into batches of states, next states, actions, and rewards
