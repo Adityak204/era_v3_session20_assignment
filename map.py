@@ -274,7 +274,7 @@ class Game(Widget):
 
         # Based on car coordinates if car is in sand, we reduce its velocity and give it a negative reward
         else:  # otherwise
-            self.car.velocity = Vector(2, 0).rotate(self.car.angle)
+            self.car.velocity = Vector(3, 0).rotate(self.car.angle)
             last_reward = -0.2
             if distance < last_distance:
                 last_reward = 0.4
@@ -370,17 +370,17 @@ class CarApp(App):
         parent = Game()
         parent.serve_car()
         Clock.schedule_interval(parent.update, 1.0 / 60.0)
-        self.painter = MyPaintWidget()
-        clearbtn = Button(text="clear")
-        savebtn = Button(text="save", pos=(parent.width, 0))
-        loadbtn = Button(text="load", pos=(2 * parent.width, 0))
-        clearbtn.bind(on_release=self.clear_canvas)
-        savebtn.bind(on_release=self.save)
-        loadbtn.bind(on_release=self.load)
-        parent.add_widget(self.painter)
-        parent.add_widget(clearbtn)
-        parent.add_widget(savebtn)
-        parent.add_widget(loadbtn)
+        # self.painter = MyPaintWidget()
+        # clearbtn = Button(text="clear")
+        # savebtn = Button(text="save", pos=(parent.width, 0))
+        # loadbtn = Button(text="load", pos=(2 * parent.width, 0))
+        # clearbtn.bind(on_release=self.clear_canvas)
+        # savebtn.bind(on_release=self.save)
+        # loadbtn.bind(on_release=self.load)
+        # parent.add_widget(self.painter)
+        # parent.add_widget(clearbtn)
+        # parent.add_widget(savebtn)
+        # parent.add_widget(loadbtn)
         return parent
 
     def clear_canvas(self, obj):
