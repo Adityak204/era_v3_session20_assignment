@@ -313,12 +313,12 @@ class Game(Widget):
         if distance < 25:
             # it is difficult for car to exact x,y coordinate of goal, so we give it a range of 25
             if swap == 1:
-                goal_x = 230
-                goal_y = 330
+                goal_x = 974
+                goal_y = 237
                 swap = 0
             else:
-                goal_x = 1147
-                goal_y = 601
+                goal_x = 810
+                goal_y = 473
                 swap = 1
         last_distance = distance
 
