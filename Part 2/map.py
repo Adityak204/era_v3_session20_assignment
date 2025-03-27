@@ -258,7 +258,7 @@ class Game(Widget):
 
         if sand[int(self.car.x), int(self.car.y)] > 0:
             self.car.velocity = Vector(0.5, 0).rotate(self.car.angle)
-            last_reward = -1.2
+            last_reward = -2.2
             logger.info(
                 f"""
                 location: sand,
@@ -275,9 +275,9 @@ class Game(Widget):
         # Based on car coordinates if car is in sand, we reduce its velocity and give it a negative reward
         else:  # otherwise
             self.car.velocity = Vector(3, 0).rotate(self.car.angle)
-            last_reward = -0.2
+            last_reward = -0.1
             if distance < last_distance:
-                last_reward = 0.4
+                last_reward = 1.4
             logger.info(
                 f"""
                 location: road,
